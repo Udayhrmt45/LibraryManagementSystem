@@ -5,9 +5,12 @@ namespace LibraryManagementSystem.Service.Abstractions;
 
 public interface IBookIssueService
 {
-    Task<BookIssueResponseDto>
-        IssueBookAsync(
-            IssueBookRequestDto request);
+    //Task<BookIssueResponseDto>
+    //    IssueBookAsync(
+    //        IssueBookRequestDto request);
+
+    Task IssueBookAsync(
+            IssueBookRequestDto request, string createdBy);
 
     Task ReturnBookAsync(
         ReturnBookRequestDto request);

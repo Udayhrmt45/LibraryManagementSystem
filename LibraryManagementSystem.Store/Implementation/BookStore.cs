@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using LibraryManagementSystem.Common.DTOs.Requests;
+using LibraryManagementSystem.Common.Constants;
 
 namespace LibraryManagementSystem.Store.Implementations;
 
@@ -229,7 +230,7 @@ public class BookStore : IBookStore
 
             using var command =
                 new SqlCommand(
-                    "usp_BulkInsertBooks",
+                    SqlConstants.UspBulkInsertBooks,
                     connection);
 
             command.CommandType =

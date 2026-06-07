@@ -1,4 +1,5 @@
-﻿using LibraryManagementSystem.Common.DTOs.Requests;
+﻿using LibraryManagementSystem.Common;
+using LibraryManagementSystem.Common.DTOs.Requests;
 using LibraryManagementSystem.Service.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -119,6 +120,30 @@ public class CategoryController : ControllerBase
             await _categoryService
                 .GetCategoryByUniqueIdAsync(
                     uniqueId));
+    }
+
+    /// <summary>
+    /// Bulk inserts multiple categories.
+    /// </summary>
+    /// <response code="200">
+    /// Categories inserted successfully.
+    /// </response>
+    [HttpPost]
+    public async Task<IActionResult>
+        BulkInsertCategoriesAsync(
+            [FromBody]
+        BulkInsertCategoriesRequestDto request)
+    {
+        await _categoryService
+            .BulkInsertCategoriesAsync(request);
+
+        return Ok(
+            new CommonResponse<string>
+            {
+                Success = true,
+                Message =
+                    "Categories inserted successfully."
+            });
     }
 
     /// <summary>

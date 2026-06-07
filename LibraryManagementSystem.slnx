@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Readme.md" />
+  </Folder>
   <Project Path="LibraryManagementSystem.Common/LibraryManagementSystem.Common.csproj" />
   <Project Path="LibraryManagementSystem.Service/LibraryManagementSystem.Service.csproj" />
   <Project Path="LibraryManagementSystem.Store/LibraryManagementSystem.Store.csproj" />

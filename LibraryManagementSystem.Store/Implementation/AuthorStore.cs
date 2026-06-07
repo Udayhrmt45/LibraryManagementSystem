@@ -1,7 +1,11 @@
-﻿using LibraryManagementSystem.Common.Models;
+﻿using LibraryManagementSystem.Common.DTOs.Requests;
+using LibraryManagementSystem.Common.Models;
 using LibraryManagementSystem.Store.Abstractions;
 using LibraryManagementSystem.Store.Context;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using LibraryManagementSystem.Common.Constants;
 
 namespace LibraryManagementSystem.Store.Implementations;
 
@@ -13,6 +17,24 @@ public class AuthorStore : IAuthorStore
         LibraryDbContext context)
     {
         _context = context;
+    }
+
+    private DataTable BuildAuthorDataTable(
+    List<CreateAuthorRequestDto> authors)
+    {
+        var table = new DataTable();
+
+        table.Columns.Add(
+            "AuthorName",
+            typeof(string));
+
+        foreach (var author in authors)
+        {
+            table.Rows.Add(
+                author.AuthorName);
+        }
+
+        return table;
     }
 
     public async Task<Author> CreateAuthorAsync(
@@ -88,6 +110,45 @@ public class AuthorStore : IAuthorStore
         catch (Exception ex)
         {
             throw new Exception($"Store Error - {nameof(GetAuthorsPagedAsync)}: {ex.Message}");
+        }
+    }
+
+    public async Task BulkInsertAuthorsAsync(
+    List<CreateAuthorRequestDto> authors,
+    string createdBy)
+    {
+        try
+        {
+            var table =
+                BuildAuthorDataTable(authors);
+
+            var authorsParameter =
+                new SqlParameter(
+                    "@Authors",
+                    table)
+                {
+                    SqlDbType =
+                        SqlDbType.Structured,
+
+                    TypeName =
+                        "Author_Type"
+                };
+
+            var createdByParameter =
+                new SqlParameter(
+                    "@CreatedBy",
+                    createdBy);
+
+            await _context.Database.ExecuteSqlRawAsync(
+                $"EXEC {SqlConstants.UspBulkInsertAuthors}\n                @Authors,\n                @CreatedBy",
+                authorsParameter,
+                createdByParameter);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(
+                "Error occurred while bulk inserting authors.",
+                ex);
         }
     }
 

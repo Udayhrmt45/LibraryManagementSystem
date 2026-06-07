@@ -26,7 +26,9 @@ public interface IBookStore
     Task<Category?> GetCategoryByUniqueIdAsync(
         string uniqueId);
 
-    Task BulkInsertBooksAsync(List<BulkBookRequestDto> books, string createdBy);
+    Task BulkInsertBooksAsync(
+    List<BulkBookRequestDto> books,
+    string createdBy);
 
     Task UpdateBookAsync(Book book);
 

@@ -3,6 +3,8 @@ using LibraryManagementSystem.Common.DTOs.Responses;
 using LibraryManagementSystem.Common.Models;
 using LibraryManagementSystem.Service.Abstractions;
 using LibraryManagementSystem.Store.Abstractions;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagementSystem.Service.Implementations;
 
@@ -16,179 +18,179 @@ public class BookIssueService : IBookIssueService
         _bookIssueStore = bookIssueStore;
     }
 
-    public async Task<BookIssueResponseDto> IssueBookAsync(
-        IssueBookRequestDto request)
-    {
-        try
-        {
-            var member =
-                await _bookIssueStore
-                    .GetMemberByUniqueIdAsync(
-                        request.MemberUniqueId);
+    //public async Task<BookIssueResponseDto> IssueBookAsync(
+    //    IssueBookRequestDto request)
+    //{
+    //    try
+    //    {
+    //        var member =
+    //            await _bookIssueStore
+    //                .GetMemberByUniqueIdAsync(
+    //                    request.MemberUniqueId);
 
-            if (member == null)
-            {
-                throw new Exception(
-                    "Member not found");
-            }
+    //        if (member == null)
+    //        {
+    //            throw new Exception(
+    //                "Member not found");
+    //        }
 
-            var book =
-                await _bookIssueStore
-                    .GetBookByUniqueIdAsync(
-                        request.BookUniqueId);
+    //        var book =
+    //            await _bookIssueStore
+    //                .GetBookByUniqueIdAsync(
+    //                    request.BookUniqueId);
 
-            if (book == null)
-            {
-                throw new Exception(
-                    "Book not found");
-            }
+    //        if (book == null)
+    //        {
+    //            throw new Exception(
+    //                "Book not found");
+    //        }
 
-            if (book.AvailableCopies <= 0)
-            {
-                throw new Exception(
-                    "Book is not available");
-            }
+    //        if (book.AvailableCopies <= 0)
+    //        {
+    //            throw new Exception(
+    //                "Book is not available");
+    //        }
 
-            var issue = new BookIssue
-            {
-                MemberId = member.MemberId,
+    //        var issue = new BookIssue
+    //        {
+    //            MemberId = member.MemberId,
 
-                BookId = book.BookId,
+    //            BookId = book.BookId,
 
-                IssueDate = DateTime.UtcNow,
+    //            IssueDate = DateTime.UtcNow,
 
-                DueDate =
-                    DateTime.UtcNow.AddDays(
-                        request.BorrowDays),
+    //            DueDate =
+    //                DateTime.UtcNow.AddDays(
+    //                    request.BorrowDays),
 
-                Status = "Issued",
+    //            Status = "Issued",
 
-                IsActive = true,
+    //            IsActive = true,
 
-                CreatedOn = DateTime.UtcNow
-            };
+    //            CreatedOn = DateTime.UtcNow
+    //        };
 
-            book.AvailableCopies--;
+    //        book.AvailableCopies--;
 
-            await _bookIssueStore
-                .UpdateBookAsync(book);
+    //        await _bookIssueStore
+    //            .UpdateBookAsync(book);
 
-            var createdIssue =
-                await _bookIssueStore
-                    .CreateIssueAsync(issue);
+    //        var createdIssue =
+    //            await _bookIssueStore
+    //                .CreateIssueAsync(issue);
 
-            return new BookIssueResponseDto
-            {
-                IssueUniqueId =
-                    createdIssue.UniqueId,
+    //        return new BookIssueResponseDto
+    //        {
+    //            IssueUniqueId =
+    //                createdIssue.UniqueId,
 
-                MemberName =
-                    member.FullName,
+    //            MemberName =
+    //                member.FullName,
 
-                BookTitle =
-                    book.Title,
+    //            BookTitle =
+    //                book.Title,
 
-                IssueDate =
-                    createdIssue.IssueDate,
+    //            IssueDate =
+    //                createdIssue.IssueDate,
 
-                DueDate =
-                    createdIssue.DueDate,
+    //            DueDate =
+    //                createdIssue.DueDate,
 
-                ReturnDate =
-                    createdIssue.ReturnDate,
+    //            ReturnDate =
+    //                createdIssue.ReturnDate,
 
-                Status =
-                    createdIssue.Status
-            };
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Service Error - {nameof(IssueBookAsync)}: {ex.Message}");
-        }
-    }
+    //            Status =
+    //                createdIssue.Status
+    //        };
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        throw new Exception($"Service Error - {nameof(IssueBookAsync)}: {ex.Message}");
+    //    }
+    //}
 
-    public async Task ReturnBookAsync(
-        ReturnBookRequestDto request)
-    {
-        try
-        {
-            var issue =
-                await _bookIssueStore
-                    .GetIssueByUniqueIdAsync(
-                        request.IssueUniqueId);
+    //public async Task ReturnBookAsync(
+    //    ReturnBookRequestDto request)
+    //{
+    //    try
+    //    {
+    //        var issue =
+    //            await _bookIssueStore
+    //                .GetIssueByUniqueIdAsync(
+    //                    request.IssueUniqueId);
 
-            if (issue == null)
-            {
-                throw new Exception(
-                    "Issue record not found");
-            }
+    //        if (issue == null)
+    //        {
+    //            throw new Exception(
+    //                "Issue record not found");
+    //        }
 
-            if (issue.Status == "Returned")
-            {
-                throw new Exception(
-                    "Book already returned");
-            }
+    //        if (issue.Status == "Returned")
+    //        {
+    //            throw new Exception(
+    //                "Book already returned");
+    //        }
 
-            issue.ReturnDate =
-                DateTime.UtcNow;
+    //        issue.ReturnDate =
+    //            DateTime.UtcNow;
 
-            issue.Status =
-                "Returned";
+    //        issue.Status =
+    //            "Returned";
 
-            issue.UpdatedOn =
-                DateTime.UtcNow;
+    //        issue.UpdatedOn =
+    //            DateTime.UtcNow;
 
-            await _bookIssueStore
-                .UpdateIssueAsync(issue);
+    //        await _bookIssueStore
+    //            .UpdateIssueAsync(issue);
 
-            var book =
-                await _bookIssueStore
-                    .GetBookByIdAsync(
-                        issue.BookId);
+    //        var book =
+    //            await _bookIssueStore
+    //                .GetBookByIdAsync(
+    //                    issue.BookId);
 
-            if (book != null)
-            {
-                book.AvailableCopies++;
+    //        if (book != null)
+    //        {
+    //            book.AvailableCopies++;
 
-                book.UpdatedOn =
-                    DateTime.UtcNow;
+    //            book.UpdatedOn =
+    //                DateTime.UtcNow;
 
-                await _bookIssueStore
-                    .UpdateBookAsync(book);
-            }
+    //            await _bookIssueStore
+    //                .UpdateBookAsync(book);
+    //        }
 
-            if (issue.ReturnDate >
-                issue.DueDate)
-            {
-                var lateDays =
-                    (issue.ReturnDate.Value -
-                     issue.DueDate).Days;
+    //        if (issue.ReturnDate >
+    //            issue.DueDate)
+    //        {
+    //            var lateDays =
+    //                (issue.ReturnDate.Value -
+    //                 issue.DueDate).Days;
 
-                var fine = new Fine
-                {
-                    IssueId =
-                        issue.IssueId,
+    //            var fine = new Fine
+    //            {
+    //                IssueId =
+    //                    issue.IssueId,
 
-                    FineAmount =
-                        lateDays * 10,
+    //                FineAmount =
+    //                    lateDays * 10,
 
-                    IsPaid = false,
+    //                IsPaid = false,
 
-                    IsActive = true,
+    //                IsActive = true,
 
-                    CreatedOn =
-                        DateTime.UtcNow
-                };
+    //                CreatedOn =
+    //                    DateTime.UtcNow
+    //            };
 
-                await _bookIssueStore
-                    .CreateFineAsync(fine);
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Service Error - {nameof(ReturnBookAsync)}: {ex.Message}");
-        }
-    }
+    //            await _bookIssueStore
+    //                .CreateFineAsync(fine);
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        throw new Exception($"Service Error - {nameof(ReturnBookAsync)}: {ex.Message}");
+    //    }
+    //}
 
     private static BookIssueResponseDto MapIssue(
     BookIssue issue)
@@ -296,4 +298,33 @@ public class BookIssueService : IBookIssueService
             throw new Exception($"Service Error - {nameof(GetIssuesByBookAsync)}: {ex.Message}");
         }
     }
+
+    public async Task IssueBookAsync(
+    IssueBookRequestDto request, string createdBy)
+    {
+        try { 
+        
+            DateTime dueDate = DateTime.UtcNow.AddDays(
+                request.BorrowDays);
+
+            await _bookIssueStore.IssueBookAsync(
+                request.MemberUniqueId,
+                request.BookUniqueId,
+                dueDate,
+                createdBy);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    public async Task ReturnBookAsync(
+    ReturnBookRequestDto request)
+    {
+        await _bookIssueStore.ReturnBookAsync(
+            request.IssueUniqueId,
+            "System");
+    }
+
 }

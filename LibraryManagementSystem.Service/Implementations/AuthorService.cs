@@ -139,6 +139,14 @@ public class AuthorService : IAuthorService
         }
     }
 
+    public async Task BulkInsertAuthorsAsync(
+    BulkInsertAuthorsRequestDto request)
+    {
+        await _authorStore.BulkInsertAuthorsAsync(
+            request.Authors,
+            "System");
+    }
+
     public async Task UpdateAuthorAsync(
         string uniqueId,
         UpdateAuthorRequestDto request)

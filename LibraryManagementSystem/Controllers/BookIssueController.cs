@@ -1,13 +1,17 @@
 ﻿using LibraryManagementSystem.Common;
+using LibraryManagementSystem.Common.Constants;
 using LibraryManagementSystem.Common.DTOs.Requests;
 using LibraryManagementSystem.Common.DTOs.Responses;
 using LibraryManagementSystem.Service.Abstractions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using LibraryManagementSystem.Common.Models;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystem.API.Controllers;
 
-[Authorize(Roles = "Admin,Librarian")]
+[Authorize(Roles = AppConstants.AdminRole + "," + AppConstants.LibrarianRole)]
 [ApiController]
 [Route("api/[controller]/[action]")]
 /// <summary>
@@ -44,16 +48,25 @@ public class BookIssueController : ControllerBase
     public async Task<IActionResult> IssueBookAsync(
         IssueBookRequestDto request)
     {
-        var result =
-            await _bookIssueService
-                .IssueBookAsync(request);
+        //var result =
+        //    await _bookIssueService
+        //        .IssueBookAsync(request);
+
+        await _bookIssueService.IssueBookAsync(request, User.FindFirst(ClaimTypes.Role)?.Value ?? "System");
+
+        //return Ok(
+        //    new CommonResponse<BookIssueResponseDto>
+        //    {
+        //        Success = true,
+        //        Message = "Book issued successfully",
+        //        Data = result
+        //    });
 
         return Ok(
             new CommonResponse<BookIssueResponseDto>
             {
                 Success = true,
-                Message = "Book issued successfully",
-                Data = result
+                Message = AppConstants.BookIssued
             });
     }
 
@@ -82,7 +95,7 @@ public class BookIssueController : ControllerBase
             new CommonResponse<string>
             {
                 Success = true,
-                Message = "Book returned successfully"
+                Message = AppConstants.BookReturned
             });
     }
 

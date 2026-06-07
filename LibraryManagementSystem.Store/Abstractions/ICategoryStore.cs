@@ -1,4 +1,5 @@
-﻿using LibraryManagementSystem.Common.Models;
+﻿using LibraryManagementSystem.Common.DTOs.Requests;
+using LibraryManagementSystem.Common.Models;
 
 namespace LibraryManagementSystem.Store.Abstractions;
 
@@ -16,6 +17,10 @@ public interface ICategoryStore
 
     Task<Category?> GetCategoryByUniqueIdAsync(
         string uniqueId);
+
+    Task BulkInsertCategoriesAsync(
+    List<CreateCategoryRequestDto> categories,
+    string createdBy);
 
     Task UpdateCategoryAsync(
         Category category);

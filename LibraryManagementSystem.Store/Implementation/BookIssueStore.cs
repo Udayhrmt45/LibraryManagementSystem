@@ -1,7 +1,9 @@
 ﻿using LibraryManagementSystem.Common.Models;
 using LibraryManagementSystem.Store.Abstractions;
 using LibraryManagementSystem.Store.Context;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using LibraryManagementSystem.Common.Constants;
 
 namespace LibraryManagementSystem.Store.Implementations;
 
@@ -295,5 +297,59 @@ public class BookIssueStore : IBookIssueStore
         {
             throw new Exception($"Store Error - {nameof(GetIssuesByBookUniqueIdAsync)}: {ex.Message}");
         }
+    }
+
+    public async Task IssueBookAsync(
+    string memberUniqueId,
+    string bookUniqueId,
+    DateTime dueDate,
+    string createdBy
+    )
+    {
+        try
+        {
+            await _context.Database.ExecuteSqlRawAsync(
+                $"EXEC {SqlConstants.UspIssueBook}\n                @MemberUniqueId,\n                @BookUniqueId,\n                @DueDate,\n                @CreatedBy",
+
+                new SqlParameter(
+                    "@MemberUniqueId",
+                    memberUniqueId),
+
+                new SqlParameter(
+                    "@BookUniqueId",
+                    bookUniqueId),
+
+                new SqlParameter(
+                    "@DueDate",
+                    dueDate),
+                
+                new SqlParameter(
+                    "@CreatedBy",
+                    createdBy
+                    )
+                );
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(
+                "Error occurred while issuing the book.",
+                ex);
+        }
+    }
+
+    public async Task ReturnBookAsync(
+    string issueUniqueId,
+    string updatedBy)
+    {
+        await _context.Database.ExecuteSqlRawAsync(
+            $"EXEC {SqlConstants.UspReturnBook}\n            @IssueUniqueId,\n            @UpdatedBy",
+
+            new SqlParameter(
+                "@IssueUniqueId",
+                issueUniqueId),
+
+            new SqlParameter(
+                "@UpdatedBy",
+                updatedBy));
     }
 }

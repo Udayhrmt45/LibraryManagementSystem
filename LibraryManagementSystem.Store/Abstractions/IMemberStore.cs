@@ -20,6 +20,10 @@ public interface IMemberStore
     Task<bool> EmailExistsAsync(
         string email);
 
+    Task BulkInsertMembersAsync(
+    List<BulkMemberRequestDto> members,
+    string createdBy);
+
     Task UpdateMemberAsync(
         Member member);
 

@@ -15,6 +15,9 @@ public interface IAuthorService
 
     Task<PagedResponseDto<AuthorResponseDto>> GetAuthorsPagedAsync(PaginationRequestDto request);
 
+    Task BulkInsertAuthorsAsync(
+    BulkInsertAuthorsRequestDto request);
+
     Task UpdateAuthorAsync(
         string uniqueId,
         UpdateAuthorRequestDto request);

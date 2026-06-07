@@ -20,6 +20,9 @@ public interface ICategoryService
         GetCategoryByUniqueIdAsync(
             string uniqueId);
 
+    Task BulkInsertCategoriesAsync(
+    BulkInsertCategoriesRequestDto request);
+
     Task UpdateCategoryAsync(
         string uniqueId,
         UpdateCategoryRequestDto request);

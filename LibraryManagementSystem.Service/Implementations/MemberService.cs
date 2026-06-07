@@ -182,6 +182,15 @@ public class MemberService : IMemberService
         }
     }
 
+    public async Task BulkInsertMembersAsync(
+    BulkInsertMembersRequestDto request)
+    {
+        await _memberStore
+            .BulkInsertMembersAsync(
+                request.Members,
+                "System");
+    }
+
     public async Task UpdateMemberAsync(
         string uniqueId,
         UpdateMemberRequestDto request)

@@ -38,4 +38,14 @@ public interface IBookIssueStore
 
     Task<List<BookIssue>> GetIssuesByBookUniqueIdAsync(
         string bookUniqueId);
+
+    Task IssueBookAsync(
+        string memberUniqueId,
+        string bookUniqueId,
+        DateTime dueDate,
+        string createdby);
+
+    Task ReturnBookAsync(
+        string issueUniqueId,
+        string updatedBy);
 }

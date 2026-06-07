@@ -14,6 +14,10 @@ public interface IMemberService
 
     Task<MemberResponseDto> GetMemberByUniqueIdAsync(
             string uniqueId);
+
+    Task BulkInsertMembersAsync(
+    BulkInsertMembersRequestDto request);
+
     Task UpdateMemberAsync(string uniqueId, UpdateMemberRequestDto request);
 
     Task DeleteMemberAsync(string uniqueId);

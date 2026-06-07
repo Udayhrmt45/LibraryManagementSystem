@@ -1,4 +1,5 @@
-﻿using LibraryManagementSystem.Common.Models;
+﻿using LibraryManagementSystem.Common.DTOs.Requests;
+using LibraryManagementSystem.Common.Models;
 
 public interface IAuthorStore
 {
@@ -13,6 +14,10 @@ public interface IAuthorStore
 
     Task<Author?> GetAuthorByUniqueIdAsync(
         string uniqueId);
+
+    Task BulkInsertAuthorsAsync(
+    List<CreateAuthorRequestDto> authors,
+    string createdBy);
 
     Task UpdateAuthorAsync(Author author);
 

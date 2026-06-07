@@ -1,7 +1,10 @@
 ﻿using LibraryManagementSystem.Common.Models;
 using LibraryManagementSystem.Store.Abstractions;
 using LibraryManagementSystem.Store.Context;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using LibraryManagementSystem.Common.Constants;
 
 namespace LibraryManagementSystem.Store.Implementations;
 
@@ -13,6 +16,34 @@ public class MemberStore : IMemberStore
         LibraryDbContext context)
     {
         _context = context;
+    }
+
+    private DataTable BuildMemberDataTable(
+    List<BulkMemberRequestDto> members)
+    {
+        var table = new DataTable();
+
+        table.Columns.Add(
+            "FullName",
+            typeof(string));
+
+        table.Columns.Add(
+            "Email",
+            typeof(string));
+
+        table.Columns.Add(
+            "PhoneNumber",
+            typeof(string));
+
+        foreach (var member in members)
+        {
+            table.Rows.Add(
+                member.FullName,
+                member.Email,
+                member.PhoneNumber);
+        }
+
+        return table;
     }
 
     public async Task<Member> CreateMemberAsync(
@@ -103,6 +134,46 @@ public class MemberStore : IMemberStore
         catch (Exception ex)
         {
             throw new Exception($"Store Error - {nameof(EmailExistsAsync)}: {ex.Message}");
+        }
+    }
+
+    public async Task BulkInsertMembersAsync(
+    List<BulkMemberRequestDto> members,
+    string createdBy)
+    {
+        try
+        {
+            var table =
+                BuildMemberDataTable(members);
+
+            var membersParameter =
+                new SqlParameter(
+                    "@Members",
+                    table)
+                {
+                    SqlDbType =
+                        SqlDbType.Structured,
+
+                    TypeName =
+                        "Member_Type"
+                };
+
+            var createdByParameter =
+                new SqlParameter(
+                    "@CreatedBy",
+                    createdBy);
+
+            await _context.Database
+                .ExecuteSqlRawAsync(
+                    $"EXEC {SqlConstants.UspBulkInsertMembers}\n                    @Members,\n                    @CreatedBy",
+                    membersParameter,
+                    createdByParameter);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(
+                "Error occurred while bulk inserting members.",
+                ex);
         }
     }
 

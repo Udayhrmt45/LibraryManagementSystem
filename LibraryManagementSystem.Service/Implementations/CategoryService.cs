@@ -137,6 +137,15 @@ public class CategoryService : ICategoryService
         }
     }
 
+    public async Task BulkInsertCategoriesAsync(
+    BulkInsertCategoriesRequestDto request)
+    {
+        await _categoryStore
+            .BulkInsertCategoriesAsync(
+                request.Categories,
+                "System");
+    }
+
     public async Task UpdateCategoryAsync(
         string uniqueId,
         UpdateCategoryRequestDto request)

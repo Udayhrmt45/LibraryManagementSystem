@@ -3,11 +3,12 @@ using LibraryManagementSystem.Common.DTOs.Requests;
 using LibraryManagementSystem.Common.DTOs.Responses;
 using LibraryManagementSystem.Service.Abstractions;
 using Microsoft.AspNetCore.Authorization;
+using LibraryManagementSystem.Common.Constants;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystem.API.Controllers;
 
-[Authorize(Roles = "Admin,Librarian")]
+[Authorize(Roles = AppConstants.AdminRole + "," + AppConstants.LibrarianRole)]
 [ApiController]
 [Route("api/[controller]/[action]")]
 /// <summary>
@@ -152,6 +153,28 @@ public class MemberController : ControllerBase
                 Success = true,
                 Message = "Member retrieved successfully",
                 Data = result
+            });
+    }
+
+
+    /// <summary>
+    /// Bulk inserts multiple members.
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult>
+        BulkInsertMembersAsync(
+            [FromBody]
+        BulkInsertMembersRequestDto request)
+    {
+        await _memberService
+            .BulkInsertMembersAsync(request);
+
+        return Ok(
+            new CommonResponse<object>
+            {
+                Success = true,
+                Message = AppConstants.MembersInserted,
+                Data = null
             });
     }
 

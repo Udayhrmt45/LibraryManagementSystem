@@ -3,6 +3,7 @@ using LibraryManagementSystem.Common.DTOs.Requests;
 using LibraryManagementSystem.Common.DTOs.Responses;
 using LibraryManagementSystem.Service.Abstractions;
 using Microsoft.AspNetCore.Authorization;
+using LibraryManagementSystem.Common.Constants;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementSystem.API.Controllers;
@@ -14,7 +15,7 @@ namespace LibraryManagementSystem.API.Controllers;
 /// All endpoints on this controller require the caller to be authorized with the Admin role.
 /// The controller coordinates user CRUD operations via the IUserService abstraction.
 /// </remarks>
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = AppConstants.AdminRole)]
 [ApiController]
 [Route("api/[controller]/[action]")]
 public class UserController : ControllerBase

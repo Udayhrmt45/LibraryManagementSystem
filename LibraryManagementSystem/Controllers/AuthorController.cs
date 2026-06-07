@@ -2,12 +2,15 @@
 using LibraryManagementSystem.Common.DTOs.Requests;
 using LibraryManagementSystem.Common.DTOs.Responses;
 using LibraryManagementSystem.Service.Abstractions;
+using LibraryManagementSystem.Common.Constants;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using LibraryManagementSystem.Common.Models;
 
 namespace LibraryManagementSystem.API.Controllers;
 
-[Authorize]
+[Authorize(Roles = AppConstants.AdminRole + "," + AppConstants.LibrarianRole)]
 [ApiController]
 [Route("api/[controller]/[action]")]
 /// <summary>
@@ -52,7 +55,7 @@ public class AuthorController : ControllerBase
             new CommonResponse<AuthorResponseDto>
             {
                 Success = true,
-                Message = "Author created successfully",
+                Message = AppConstants.AuthorCreated,
                 Data = result
             });
     }
@@ -82,7 +85,7 @@ public class AuthorController : ControllerBase
             new CommonResponse<List<AuthorResponseDto>>
             {
                 Success = true,
-                Message = "Authors retrieved successfully",
+                Message = AppConstants.AuthorsRetrived,
                 Data = result
             });
     }
@@ -114,7 +117,7 @@ public class AuthorController : ControllerBase
             new CommonResponse<AuthorResponseDto>
             {
                 Success = true,
-                Message = "Author retrieved successfully",
+                Message = AppConstants.AuthorsRetrived,
                 Data = result
             });
     }
@@ -147,9 +150,30 @@ public class AuthorController : ControllerBase
                 PagedResponseDto<AuthorResponseDto>>
             {
                 Success = true,
-                Message = "Authors retrieved successfully",
+                Message = AppConstants.AuthorsRetrived,
                 Data = result
             });
+    }
+
+    /// <summary>
+    /// Bulk inserts multiple authors.
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult>
+        BulkInsertAuthorsAsync(
+            [FromBody]
+        BulkInsertAuthorsRequestDto request)
+    {
+        await _authorService
+            .BulkInsertAuthorsAsync(request);
+
+        return Ok(
+        new CommonResponse<object>
+        {
+            Success = true,
+            Message = AppConstants.AuthorsInserted,
+            Data = null
+        });
     }
 
     /// <summary>
@@ -180,7 +204,7 @@ public class AuthorController : ControllerBase
             new CommonResponse<string>
             {
                 Success = true,
-                Message = "Author updated successfully"
+                Message = AppConstants.AuthorUpdated
             });
     }
 
@@ -210,7 +234,7 @@ public class AuthorController : ControllerBase
             new CommonResponse<string>
             {
                 Success = true,
-                Message = "Author deleted successfully"
+                Message = AppConstants.AuthorDeleted
             });
     }
 }

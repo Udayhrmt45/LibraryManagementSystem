@@ -4,8 +4,6 @@ using LibraryManagementSystem.Common.DTOs.Requests;
 using LibraryManagementSystem.Common.DTOs.Responses;
 using LibraryManagementSystem.Service.Abstractions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
-using LibraryManagementSystem.Common.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,20 +45,8 @@ public class BookIssueController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> IssueBookAsync(
         IssueBookRequestDto request)
-    {
-        //var result =
-        //    await _bookIssueService
-        //        .IssueBookAsync(request);
-
+    { 
         await _bookIssueService.IssueBookAsync(request, User.FindFirst(ClaimTypes.Role)?.Value ?? "System");
-
-        //return Ok(
-        //    new CommonResponse<BookIssueResponseDto>
-        //    {
-        //        Success = true,
-        //        Message = "Book issued successfully",
-        //        Data = result
-        //    });
 
         return Ok(
             new CommonResponse<BookIssueResponseDto>
